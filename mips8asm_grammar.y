@@ -1,5 +1,3 @@
-%token_type {TokenInfo}  
-  
 %include {
 #include <cstdlib>
 #include <iostream>
@@ -15,6 +13,7 @@ using namespace std;
 void reportError(string msg);
 }  
 
+%token_type {TokenInfo}
 %default_type {TokenInfo}
 %type inst {TokenInfo}
    
@@ -46,8 +45,8 @@ inst(R) ::= KW_MOV TK_REG(A) TK_COMMA TK_REG(B). { R.node = new MIPS8Mov(A.ival,
 inst(R) ::= KW_LW  TK_REG(A) TK_COMMA TK_REG(B). { R.node = new MIPS8Lw(A.ival, B.ival); }
 inst(R) ::= KW_SW  TK_REG(A) TK_COMMA TK_REG(B). { R.node = new MIPS8Sw(A.ival, B.ival); }
 inst(R) ::= KW_LI  TK_REG(A) TK_COMMA constant(N). { R.node = new MIPS8Li(A.ival, N.ival); }
-inst(R) ::= KW_ADDI TK_REG(A) TK_COMMA constant(N). { R.node = new MIPS8Li(A.ival, N.ival); }
-inst(R) ::= KW_SUBI TK_REG(A) TK_COMMA constant(N). { R.node = new MIPS8Li(A.ival, N.ival); }
+inst(R) ::= KW_ADDI TK_REG(A) TK_COMMA constant(N). { R.node = new MIPS8Addi(A.ival, N.ival); }
+inst(R) ::= KW_SUBI TK_REG(A) TK_COMMA constant(N). { R.node = new MIPS8Subi(A.ival, N.ival); }
 inst(R) ::= KW_CMP TK_REG(A) TK_COMMA TK_REG(B). { R.node = new MIPS8Cmp(A.ival, B.ival); }
 inst(R) ::= KW_JZ TK_ID(L). { R.node = new MIPS8Jz(L.str); free(L.str); }
 inst(R) ::= KW_JNZ TK_ID(L). { R.node = new MIPS8Jnz(L.str); free(L.str); }
