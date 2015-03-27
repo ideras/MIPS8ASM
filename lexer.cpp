@@ -75,6 +75,14 @@ int Lexer::getNextToken()
             line ++;
             return TK_EOL;
         }
+		else if (ch == '\r') {
+			ch = nextChar();
+			if (ch != '\n')
+				ungetChar(ch);
+
+			line++;
+			return TK_EOL;
+		}
         else if (isalpha(ch) || ch=='_') {
             
             stringBuffer.str("");

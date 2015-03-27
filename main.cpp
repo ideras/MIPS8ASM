@@ -25,7 +25,7 @@ void Parse(void *yyp, int yymajor, TokenInfo yyminor);
 
 int main(int argc, char *argv[])
 {
-    if (argc > 1) {
+    if (argc > 2) {
             ++argv, --argc; /* El primer argumento es el nombre del programa */
             in.open(argv[0], ifstream::in|ifstream::binary);
 
