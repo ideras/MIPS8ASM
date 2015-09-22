@@ -9,7 +9,7 @@ int opcode[] = {
     0x03, //Or
     0x04, //And
     0x05, //Xor
-    0x05, //Mov
+    0x06, //Mov
     0x07, //Lw
     0x08, //Sw
     0x09, //Li
