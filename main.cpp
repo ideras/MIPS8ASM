@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 
         token = lex.getNextToken();
     }
+	Parse(pParser, TK_EOF, tokenInfo);
 
     ParseFree(pParser, free);
 
