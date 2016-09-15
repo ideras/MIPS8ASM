@@ -9,9 +9,9 @@
                 while (f(ch)) { \
                     sb << (char)ch;\
                     ch = nextChar();\
-			    } \
+                } \
                 ungetChar(ch); \
-			} while (0)
+            } while (0)
 
 struct  Keyword
 {
@@ -20,29 +20,29 @@ struct  Keyword
 };
 
 Keyword kw[] = {
-		  {"nop", KW_NOP},
-		  {"add", KW_ADD},
-		  {"sub", KW_SUB},
-		  {"or", KW_OR},
-		  {"and", KW_AND},
-		  {"xor", KW_XOR},
-		  {"mov", KW_MOV},
-		  {"lw", KW_LW},
-		  {"sw", KW_SW},
-		  {"li", KW_LI},
-		  {"addi", KW_ADDI},
-		  {"subi", KW_SUBI},
-		  {"cmp", KW_CMP},
-		  {"jz", KW_JZ},
-		  {"jnz", KW_JNZ},
-		  {"jg", KW_JG},
-		  {"jl", KW_JL},
-		  {"jmp", KW_JUMP},
+          {"nop", KW_NOP},
+          {"add", KW_ADD},
+          {"sub", KW_SUB},
+          {"or", KW_OR},
+          {"and", KW_AND},
+          {"xor", KW_XOR},
+          {"mov", KW_MOV},
+          {"lw", KW_LW},
+          {"sw", KW_SW},
+          {"li", KW_LI},
+          {"addi", KW_ADDI},
+          {"subi", KW_SUBI},
+          {"cmp", KW_CMP},
+          {"jz", KW_JZ},
+          {"jnz", KW_JNZ},
+          {"jg", KW_JG},
+          {"jl", KW_JL},
+          {"jmp", KW_JUMP},
           {"r0", TK_REG},
           {"r1", TK_REG},
           {"r2", TK_REG},
           {"r3", TK_REG},
-	      };
+          };
 
 inline int isbdigit(int ch) {
     return ((ch == '0') || (ch == '1'));
@@ -68,21 +68,29 @@ int Lexer::getNextToken()
                     break;
             }
         }
-	    
+        
         stringBuffer << (char)ch;
 
         if (ch == '\n'){
-            line ++;
+            ch = nextChar();
+            if(ch == EOF)
+                return TK_EOF;
+            ungetChar(ch);
+            line++;
             return TK_EOL;
         }
-		else if (ch == '\r') {
-			ch = nextChar();
-			if (ch != '\n')
-				ungetChar(ch);
-
-			line++;
-			return TK_EOL;
-		}
+        else if (ch == '\r') {
+            ch = nextChar();
+            if (ch == '\n')
+            {
+                ch = nextChar();
+                if(ch == EOF)
+                    return TK_EOF;
+                line++;
+                return TK_EOL;
+            }
+            ungetChar(ch);
+        }
         else if (isalpha(ch) || ch=='_') {
             
             stringBuffer.str("");
