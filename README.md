@@ -35,7 +35,7 @@ module InstructionMemory(
             8'h02: data = 16'h4DF6;
             8'h03: data = 16'h4F96;
             8'h04: data = 16'h0880;
-            8'h05: data = 16'h4E02;
+            8'h05: data = 16'h5602;
             8'h06: data = 16'h6180;
             8'h07: data = 16'h6800;
             8'h08: data = 16'h8820;
