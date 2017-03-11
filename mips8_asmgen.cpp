@@ -1,4 +1,5 @@
 #include <sstream>
+#include <string>
 #include "mips8_asmgen.h"
 
 using namespace std;
@@ -48,6 +49,39 @@ void numToHex(char str[], int n, int size) {
     }
 }
 
+string numberToBinaryString(unsigned int x, string strFormat)
+{
+    string result;
+    int pos = 0;
+
+    result.reserve(64);
+
+    for (unsigned int mask = (1 << 15); mask > 0; mask >>= 1) {
+        if (strFormat[pos] == '#')
+            result += ((x & mask) == 0) ? '0' : '1';
+        else {
+            while (strFormat[pos] != '#' && pos < strFormat.length()) {
+                result += strFormat[pos];
+                pos ++;
+            }
+            result += ((x & mask) == 0) ? '0' : '1';
+        }
+        pos++;
+    }
+
+    return result;
+}
+
+static inline string getFormatString(int format) {    
+    switch (format) {
+        case R_FORMAT: return "#####_###_###_#####";
+        case I_FORMAT: return "#####_###_########";
+        case J_FORMAT: return "#####_########_##";
+        default:
+            return "";
+    }
+}
+
 void MIPS8AsmGen::resolveLabels()
 {
     ListNode::iterator it = statements.begin();
@@ -72,6 +106,7 @@ int MIPS8AsmGen::genAsm(ostream &out)
 {
     ListNode::iterator it = statements.begin();
     int index = 0;
+    int instFormat;
     char str[5];
 
     resolveLabels();
@@ -108,7 +143,12 @@ int MIPS8AsmGen::genAsm(ostream &out)
                 int r0 = inode->getReg1();
                 int r1 = inode->getReg2();
 
-                instruction |= ((r0 & 0x3) << 9) | ((r1 & 0x3) << 7);
+                instFormat = R_FORMAT;
+                if (use3BitRegAddress)
+                    instruction |= ((r0 & 0x7) << 8) | ((r1 & 0x7) << 5);
+                else
+                    instruction |= ((r0 & 0x3) << 9) | ((r1 & 0x3) << 7);
+                
                 break;
             }
             case MIPS8_LI_INST:
@@ -118,7 +158,12 @@ int MIPS8AsmGen::genAsm(ostream &out)
                 int r = inode->getReg();
                 int imm = inode->getImmediate();
 
-                instruction |= ((r & 0x3) << 9) | ((imm & 0xFF) << 1);
+                instFormat = I_FORMAT;
+                if (use3BitRegAddress)
+                    instruction |= ((r & 0x3) << 8) | (imm & 0xFF);
+                else
+                    instruction |= ((r & 0x3) << 9) | ((imm & 0xFF) << 1);
+                
                 break;
             }
             case MIPS8_JZ_INST:
@@ -129,6 +174,7 @@ int MIPS8AsmGen::genAsm(ostream &out)
                 MIPS8JFmtInst *inode = (MIPS8JFmtInst *)node;
                 string label = inode->getLabel();
 
+                instFormat = J_FORMAT;
                 if (labelMap.find(label) != labelMap.end()) {
                     int target = labelMap[label];
 
@@ -148,15 +194,25 @@ int MIPS8AsmGen::genAsm(ostream &out)
         }
 
         numToHex(str, index, 8);
-
-        out << "            8'h" << str << ": data = 16'h";
-        numToHex(str, instruction, 16);
-        out << str << ";" << endl;
+        
+        if (useBinaryFormat) {
+            string strInst = numberToBinaryString(instruction, getFormatString(instFormat));
+            
+            out << "            8'h" << str << ": data = 16'b";
+            out << strInst << ";" << endl;
+        } else {
+            out << "            8'h" << str << ": data = 16'h";
+            numToHex(str, instruction, 16);
+            out << str << ";" << endl;
+        }
 
         index++;
     }
 
-	out << "            default: data = 16'h0000;" << endl;
+    if (useBinaryFormat)
+        out << "            default: data = 16'b0000000000000000;" << endl;
+    else
+        out << "            default: data = 16'h0000;" << endl;
 
     out << "        endcase" << endl <<
            "    end" << endl <<

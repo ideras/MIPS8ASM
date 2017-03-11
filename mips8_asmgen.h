@@ -7,7 +7,9 @@
 class MIPS8AsmGen
 {
 public:
-    MIPS8AsmGen(ListNode &statements) {
+    MIPS8AsmGen(ListNode &statements, bool use3BitRegAddress, bool useBinaryFormat) {
+        this->useBinaryFormat = useBinaryFormat;
+        this->use3BitRegAddress = use3BitRegAddress;
         this->statements = statements;
     }
 
@@ -15,6 +17,8 @@ public:
 private:
     void resolveLabels();
 private:
+    bool use3BitRegAddress;
+    bool useBinaryFormat;
     ListNode statements;
     map<string, int> labelMap;
 };

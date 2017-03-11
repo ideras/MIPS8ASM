@@ -4,6 +4,10 @@
 #include <list>
 #include <string>
 
+#define R_FORMAT 0
+#define I_FORMAT 1
+#define J_FORMAT 2
+
 #define MIPS8_ADD_INST  0
 #define MIPS8_SUB_INST  1
 #define MIPS8_OR_INST   2
