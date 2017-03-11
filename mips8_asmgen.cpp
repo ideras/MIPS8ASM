@@ -160,7 +160,7 @@ int MIPS8AsmGen::genAsm(ostream &out)
 
                 instFormat = I_FORMAT;
                 if (use3BitRegAddress)
-                    instruction |= ((r & 0x3) << 8) | (imm & 0xFF);
+                    instruction |= ((r & 0x7) << 8) | (imm & 0xFF);
                 else
                     instruction |= ((r & 0x3) << 9) | ((imm & 0xFF) << 1);
                 
