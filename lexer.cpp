@@ -9,9 +9,9 @@
                 while (f(ch)) { \
                     sb << (char)ch;\
                     ch = nextChar();\
-			    } \
+                } \
                 ungetChar(ch); \
-			} while (0)
+            } while (0)
 
 struct  Keyword
 {
@@ -72,21 +72,29 @@ int Lexer::getNextToken()
                     break;
             }
         }
-	    
+        
         stringBuffer << (char)ch;
 
         if (ch == '\n'){
-            line ++;
+            ch = nextChar();
+            if(ch == EOF)
+                return TK_EOF;
+            ungetChar(ch);
+            line++;
             return TK_EOL;
         }
-		else if (ch == '\r') {
-			ch = nextChar();
-			if (ch != '\n')
-				ungetChar(ch);
-
-			line++;
-			return TK_EOL;
-		}
+        else if (ch == '\r') {
+            ch = nextChar();
+            if (ch == '\n')
+            {
+                ch = nextChar();
+                if(ch == EOF)
+                    return TK_EOF;
+                line++;
+                return TK_EOL;
+            }
+            ungetChar(ch);
+        }
         else if (isalpha(ch) || ch=='_') {
             
             stringBuffer.str("");
